@@ -1,7 +1,6 @@
 import Network.IRC.Aeosunth.Config
-import Network.IRC.Aeosunth.Logger
 import Network.IRC.Aeosunth.Master
 
 main = do args <- getArgs
           conf <- configFromFile (if null args then "aeosunth-master.yaml" else head args) masterDefaults
-          startMaster LogStdout conf
+          startMaster conf
