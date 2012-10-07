@@ -2,9 +2,6 @@
 
 module Network.IRC.Aeosunth.Parser
   ( serverMessage
-  , dropLine
-  , readServerMessageWith
-  , readServerMessagesFromTo
   )
  where
 
@@ -57,14 +54,3 @@ crlf = string "\r\n" *> pure ()  <?> "crlf"
 dropLine :: Text -> Text
 
 dropLine = Text.drop 1 . Text.dropWhile (/= '\n')
-
-readServerMessageWith :: IO Text -> Text -> IO (ServerMessage, Text)
-
-readServerMessageWith a i = do p <- parseWith a serverMessage i
-                               case p of
-                                    Done r msg -> return (msg, r)
-                                    Fail e _ _ -> readServerMessageWith a (dropLine e)
-
-readServerMessagesFromTo :: IO Text -> (ServerMessage -> IO a) -> Text -> IO ()
-
-readServerMessagesFromTo r o t = readServerMessageWith r t >>= \ (msg, x) -> o msg >> readServerMessagesFromTo r o x
