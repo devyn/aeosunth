@@ -13,7 +13,8 @@ import           Data.Text (Text)
 import qualified Data.Text as Text
 
 data ServerMessage = MessageFrom (Maybe Sender) Command
-                   | Reply { replyCode   :: Int
+                   | Reply { replySender :: Maybe Sender
+                           , replyCode   :: Int
                            , replyParams :: [Text]
                            , replyBody   :: Maybe Text
                            }

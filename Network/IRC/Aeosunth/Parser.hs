@@ -16,9 +16,9 @@ import           Network.IRC.Aeosunth.Protocol
 
 serverMessage :: Parser ServerMessage
 
-serverMessage       = many crlf *> (reply <|> messageFrom) <* crlf    <?> "serverMessage"
-  where reply       = Reply <$> decimal <*> params <*> optional body  <?> "reply"
-        messageFrom = MessageFrom <$> optional sender <*> command     <?> "messageFrom"
+serverMessage       = many crlf *> (reply <|> messageFrom) <* crlf                        <?> "serverMessage"
+  where reply       = Reply <$> optional sender <*> decimal <*> params <*> optional body  <?> "reply"
+        messageFrom = MessageFrom <$> optional sender <*> command                         <?> "messageFrom"
 
 command :: Parser Command
 
