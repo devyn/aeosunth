@@ -35,4 +35,4 @@ data Command = Command { commandName   :: Text
 serializeCommand :: Command -> Text
 
 serializeCommand (Command name params body)
-  = Text.append (Text.concat . intersperse " " $ name : params ++ maybe [] ((: []) . Text.cons ':') body) "\r\n"
+  = Text.append (Text.intercalate " " $ name : params ++ maybe [] ((: []) . Text.cons ':') body) "\r\n"
