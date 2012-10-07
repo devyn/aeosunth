@@ -1,6 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Network.IRC.Aeosunth.Parser where
+module Network.IRC.Aeosunth.Parser
+  ( serverMessage
+  , dropLine
+  , readServerMessageWith
+  , readServerMessagesFromTo
+  )
+ where
 
 import           Prelude hiding (takeWhile)
 
@@ -23,13 +29,14 @@ command = Command <$> takeWhile1 (inClass "a-zA-Z") <*> params <*> optional body
 
 sender :: Parser Sender
 
-sender         = char ':' *> (server <|> user) <* many1 (char ' ')  <?> "sender"
+sender         = char ':' *> (try (user <* char ' ') <|> (server <* char ' ')) <* many (char ' ')  <?> "sender"
   where isAcc  = inClass "a-zA-Z0-9[]\\`^{}-"
-        server = empty <?> "server"
-        user   = User  <$> takeWhile1 isAcc
-                       <*> optional (char '!' *> takeWhile1 (notInClass "@ \0\r\n"))
-                       <*> optional (char '@' *> empty)
-                       <?> "user"
+        servP  = takeWhile1 (notInClass " \0\r\n")
+        server = Server <$> servP
+        user   = User   <$> takeWhile1 isAcc
+                        <*> optional (char '!' *> takeWhile1 (notInClass "@ \0\r\n"))
+                        <*> optional (char '@' *> servP)
+                        <?> "user"
 
 params :: Parser [Text]
 
@@ -46,3 +53,18 @@ body = many1 (char ' ') *> char ':' *> takeWhile (notInClass "\0\r\n")  <?> "bod
 crlf :: Parser ()
 
 crlf = string "\r\n" *> pure ()  <?> "crlf"
+
+dropLine :: Text -> Text
+
+dropLine = Text.drop 1 . Text.dropWhile (/= '\n')
+
+readServerMessageWith :: IO Text -> Text -> IO (ServerMessage, Text)
+
+readServerMessageWith a i = do p <- parseWith a serverMessage i
+                               case p of
+                                    Done r msg -> return (msg, r)
+                                    Fail e _ _ -> readServerMessageWith a (dropLine e)
+
+readServerMessagesFromTo :: IO Text -> (ServerMessage -> IO a) -> Text -> IO ()
+
+readServerMessagesFromTo r o t = readServerMessageWith r t >>= \ (msg, x) -> o msg >> readServerMessagesFromTo r o x
