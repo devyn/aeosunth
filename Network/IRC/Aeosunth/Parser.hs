@@ -37,8 +37,8 @@ sender         = char ':' *> (try (user <* char ' ') <|> (server <* char ' ')) <
 
 params :: Parser [Text]
 
-params = (:) <$> (many1 (char ' ') *> (Text.cons <$> satisfy (notInClass ": \0\r\n")
-                  <*> takeWhile (notInClass " \0\r\n")))
+params = (:) <$> (many1 (char ' ') *> (Text.cons <$> satisfy  (notInClass ": \0\r\n")
+                                                 <*> takeWhile (notInClass " \0\r\n")))
              <*> params
      <|> pure []
      <?> "params"
