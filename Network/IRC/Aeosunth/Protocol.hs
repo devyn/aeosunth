@@ -14,10 +14,10 @@ data ServerMessage = MessageFrom (Maybe Sender) Command
                            }
                    deriving (Show, Eq)
 
-data Sender = Server { servername :: Text }
-            | User   { nickname   :: Text
-                     , username   :: Maybe Text
-                     , hostname   :: Maybe Text
+data Sender = Server { serverName :: Text }
+            | User   { nickName   :: Text
+                     , userName   :: Maybe Text
+                     , hostName   :: Maybe Text
                      }
             deriving (Show, Eq)
 
