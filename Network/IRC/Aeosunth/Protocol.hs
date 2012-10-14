@@ -8,7 +8,6 @@ module Network.IRC.Aeosunth.Protocol
   )
  where
 
-import           Data.List
 import           Data.Text (Text)
 import qualified Data.Text as Text
 
